@@ -12,3 +12,11 @@ export interface userResponse extends userProps {
     createdAt: string;
 }
 
+export interface userParamProps {
+    id: string;
+}
+
+export interface userUpdateProps extends userProps {
+    userId: string
+}
+
