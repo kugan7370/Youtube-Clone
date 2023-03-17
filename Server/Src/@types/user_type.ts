@@ -17,6 +17,6 @@ export interface userParamProps {
 }
 
 export interface userUpdateProps extends userProps {
-    userId: string
+    user: userResponse;
 }
 

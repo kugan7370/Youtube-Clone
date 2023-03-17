@@ -1,7 +1,5 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
-import { userParamProps, userProps, userUpdateProps } from "../@types/user_type";
+import { NextFunction, Request, Response } from "express";
 import { createUser, deleteUser, getUserById, getUsers, loginUsers, updateUser, } from "../Services/user_service";
-import createError from "../Utils/createError";
 
 
 export const registerUserHandler = async (req: Request, res: Response, next: NextFunction) => {

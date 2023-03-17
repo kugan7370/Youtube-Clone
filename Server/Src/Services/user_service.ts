@@ -69,17 +69,22 @@ export const loginUsers = async (userData: userProps, next: NextFunction) => {
 
 export const updateUser = async (id: string, userData: userUpdateProps, next: NextFunction) => {
 
-
   try {
 
-    if (id !== userData.userId) return next(createError(400, "own user update his your profile"));
+    if (id != userData.user._id) return next(createError(400, "own user update his your profile"));
 
     if (userData.password) {
       const hashedPassword = await hashPassword(userData.password);
       userData.password = hashedPassword;
     }
-    const updatedUser = await User.findByIdAndUpdate({ _id: userData.userId }, userData, { new: true });
-    return updatedUser;
+    const updatedUser = await User.findByIdAndUpdate({ _id: userData.user._id }, userData, { new: true });
+    if (updatedUser) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...rest } = updatedUser.toObject();
+      return rest;
+    }
+
+
   } catch (error) {
     throw next(error);
   }
@@ -87,7 +92,7 @@ export const updateUser = async (id: string, userData: userUpdateProps, next: Ne
 
 export const deleteUser = async (userData: userUpdateProps, next: NextFunction) => {
   try {
-    const deletedUser = await User.findByIdAndDelete({ _id: userData.userId });
+    const deletedUser = await User.findByIdAndDelete({ _id: userData.user._id });
     return deletedUser;
   } catch (error) {
     throw next(error);
