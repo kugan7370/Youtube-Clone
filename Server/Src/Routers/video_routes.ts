@@ -1,30 +1,30 @@
 import Express from "express";
-import { addVideoHandler, deleteVideoHandler, getAllVideoHandler, getVideoByUserHandler, likeVideoHandler, updateVideoHandler, viewVideoHandler } from "../Controllers/video_controller";
 import { varifyUser } from "../Middleware/VarifyUser";
+import * as videoController from "../Controllers/video_controller";
 
 
 const router = Express.Router();
 
 //create video
-router.post("/add", varifyUser, addVideoHandler);
+router.post("/add", varifyUser, videoController.addVideoHandler);
 
 //get all videos
-router.get("/get-all", getAllVideoHandler);
+router.get("/get-all", videoController.getAllVideoHandler);
 
 //get video by user
-router.get("/get-user/:id", getVideoByUserHandler);
+router.get("/get-user/:id", videoController.getVideoByUserHandler);
 
 //update user
-router.put("/update/:id", varifyUser, updateVideoHandler);
+router.put("/update/:id", varifyUser, videoController.updateVideoHandler);
 
 //delete user
-router.delete("/delete/:id", varifyUser, deleteVideoHandler);
+router.delete("/delete/:id", varifyUser, videoController.deleteVideoHandler);
 
 //like video
-router.put("/like/:id", varifyUser, likeVideoHandler);
+router.put("/like/:id", varifyUser, videoController.likeVideoHandler);
 
 // view video
-router.put("/view/:id", varifyUser, viewVideoHandler);
+router.put("/view/:id", varifyUser, videoController.viewVideoHandler);
 
 
 

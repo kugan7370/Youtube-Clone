@@ -71,7 +71,7 @@ export const likeVideoHandler = async (req: Request, res: Response, next: NextFu
     try {
         const video = await likedVideo(id, req.body, next);
         if (video) {
-            return res.status(201).json({ message: "Video liked or deleted successfully" })
+            return res.status(201).json({ message: video.message })
         }
 
     } catch (error) {

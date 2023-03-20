@@ -1,8 +1,5 @@
 import { userResponse } from "./user_type";
 
-
-
-
 export interface videoProps {
     title: string;
     description: string;

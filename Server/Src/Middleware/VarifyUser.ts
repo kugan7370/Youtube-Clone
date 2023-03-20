@@ -15,8 +15,6 @@ export const varifyUser = async (req: Request, res: Response, next: NextFunction
     try {
         const decoded = jwt.verify(token, envValid.JWT_SECRET) as JwtPayload;
         const id = decoded.id;
-        req.body.userId = decoded.id;
-
         const user = await User.findById(id);
         if (!user) {
             return res.status(401).json({ message: "Unauthorized" });

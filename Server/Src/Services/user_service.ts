@@ -1,5 +1,5 @@
 import { NextFunction } from "express";
-import { userParamProps, userProps, userUpdateProps } from "../@types/user_type";
+import { UserInputs, userUpdateProps } from "../@types/user_type";
 import User from "../Models/user_models";
 import bcrypt from "bcrypt";
 import createError from "../Utils/createError";
@@ -13,7 +13,7 @@ export const hashPassword = async (password: string) => {
   return hashedPassword;
 };
 
-export const createUser = async (userData: userProps, next: NextFunction) => {
+export const createUser = async (userData: UserInputs, next: NextFunction) => {
   const { username, email, password } = userData;
 
   if (!username) return next(createError(400, "Username is required"));
@@ -36,7 +36,7 @@ export const createUser = async (userData: userProps, next: NextFunction) => {
   }
 };
 
-export const loginUsers = async (userData: userProps, next: NextFunction) => {
+export const loginUsers = async (userData: UserInputs, next: NextFunction) => {
   const { email, password } = userData;
   if (!email) return next(createError(400, "Email is required"));
   if (!password) return next(createError(400, "Password is required"));
@@ -77,11 +77,9 @@ export const updateUser = async (id: string, userData: userUpdateProps, next: Ne
       const hashedPassword = await hashPassword(userData.password);
       userData.password = hashedPassword;
     }
-    const updatedUser = await User.findByIdAndUpdate({ _id: userData.user._id }, userData, { new: true });
+    const updatedUser = await User.findByIdAndUpdate({ _id: userData.user._id }, userData, { new: true }).select("-password");
     if (updatedUser) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...rest } = updatedUser.toObject();
-      return rest;
+      return updatedUser;
     }
 
 
@@ -101,15 +99,10 @@ export const deleteUser = async (userData: userUpdateProps, next: NextFunction) 
 
 export const getUsers = async (next: NextFunction) => {
   try {
-    const user = await User.find();
-    if (user) {
-      const usersWithoutPassword = await Promise.all(user.map((user) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password, ...rest } = user.toObject();
-        return rest;
-      }));
-      return usersWithoutPassword;
-    }
+    const user = await User.find().select("-password");
+
+    if (user) return user;
+
   } catch (error) {
     throw next(error);
   }
@@ -117,11 +110,9 @@ export const getUsers = async (next: NextFunction) => {
 
 export const getUserById = async (id: string, next: NextFunction) => {
   try {
-    const user = await User.find({ _id: id });
+    const user = await User.find({ _id: id }).select("-password");
     if (user) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...rest } = user[0].toObject();
-      return rest;
+      return user;
     }
   } catch (error) {
     throw next(error);
