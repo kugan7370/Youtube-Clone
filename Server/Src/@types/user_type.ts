@@ -1,3 +1,4 @@
+import { Document } from "mongoose";
 
 
 export interface userResponse {
@@ -17,10 +18,13 @@ export interface userUpdateProps extends UserInputs {
 }
 
 
-export interface UserInputs {
+export interface UserInputs extends Document {
     email: string;
     username: string;
     password: string;
     img?: string;
+    subscripers?: number;
+    subscribtions?: string[];
+
 }
 

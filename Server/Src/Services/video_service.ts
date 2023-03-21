@@ -1,4 +1,4 @@
-import { NextFunction } from "express";
+import { NextFunction, response } from "express";
 import { userUpdateProps } from "../@types/user_type";
 import { addVideoProps, videoUpdateProps } from "../@types/video_types";
 import Video from "../Models/video_models";
@@ -39,9 +39,20 @@ export const getAllVideo = async (next: NextFunction) => {
 export const getVideoByUser = async (userId: string, next: NextFunction) => {
     try {
 
-        const video = await Video.find({ userId: userId }).populate("userId", "-password")
+        const video = await Video.find({ userId }).populate("userId", "-password -_id -createdAt -updatedAt -__v").lean();
+        if (video) {
+            const updatedVideo = video.map((item) => {
+                const { userId, ...rest } = item
+                return {
+                    ...rest,
+                    userDetails: userId,
+                };
+            });
+            return updatedVideo;
+            // !! in here i have used lean() to get the data in json format but i am not able to get the data in json format. 
+            // !! if not i need to use item.toObject() to get the data in json format but i am not able to get the data in json format.
 
-        return video;
+        }
 
 
     } catch (error) {
