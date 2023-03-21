@@ -49,8 +49,8 @@ export const getVideoByUser = async (userId: string, next: NextFunction) => {
                 };
             });
             return updatedVideo;
-            // !! in here i have used lean() to get the data in json format but i am not able to get the data in json format. 
-            // !! if not i need to use item.toObject() to get the data in json format but i am not able to get the data in json format.
+            // !! in here i have used lean() to get the data in json format
+            // !! if not i need to use item.toObject() to get the data in json format
 
         }
 

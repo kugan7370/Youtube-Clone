@@ -1,5 +1,5 @@
 import { NextFunction } from "express";
-import { UserInputs, userUpdateProps } from "../@types/user_type";
+import { UserInputs, userResponse, userUpdateProps } from "../@types/user_type";
 import User from "../Models/user_models";
 import bcrypt from "bcrypt";
 import createError from "../Utils/createError";
@@ -116,6 +116,47 @@ export const getUserById = async (id: string, next: NextFunction) => {
     }
   } catch (error) {
     throw next(error);
+  }
+
+}
+
+export const subscribtions = async (id: string, userDetails: userResponse, next: NextFunction) => {
+  try {
+    const user = await User.findById(userDetails);
+    const userSubscripers = await User.findById(id);
+
+    let message = ''
+    if (user && userSubscripers) {
+      if (user.subscribtions) {
+        if (user.subscribtions.includes(id) && userSubscripers.subscripers > 0) {
+          user.subscribtions = user.subscribtions.filter((item) => item != id);
+          await user.save();
+
+
+          userSubscripers.subscripers = userSubscripers.subscripers - 1;
+          await userSubscripers.save();
+
+          message = 'unsubscribed successfully';
+        }
+        else {
+          user.subscribtions.push(id);
+          await user.save();
+
+          userSubscripers.subscripers = userSubscripers.subscripers + 1;
+          await userSubscripers.save();
+
+          message = 'subscribed successfully';
+        }
+
+        return message;
+      }
+
+    }
+
+
+  } catch (error) {
+    throw next(error);
+
   }
 
 }

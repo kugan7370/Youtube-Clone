@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { createUser, deleteUser, getUserById, getUsers, loginUsers, updateUser, } from "../Services/user_service";
+import { createUser, deleteUser, getUserById, getUsers, loginUsers, subscribtions, updateUser, } from "../Services/user_service";
 
 
 export const registerUserHandler = async (req: Request, res: Response, next: NextFunction) => {
@@ -95,5 +95,22 @@ export const getUserByIdHandler = async (req: Request, res: Response, next: Next
   }
   catch (error) {
     return next(error);
+  }
+}
+
+export const subscribeUserHandler = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params
+  const { user } = req.body
+  try {
+    const message = await subscribtions(id, user, next);
+    if (message) {
+      return res
+        .status(201)
+        .json({ message });
+    }
+
+  } catch (error) {
+    return next(error);
+
   }
 }

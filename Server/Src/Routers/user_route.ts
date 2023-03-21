@@ -22,6 +22,9 @@ router.put("/update/:id", varifyUser, userController.updateUserHandler);
 //delete user
 router.delete("/delete", varifyUser, userController.deleteUserHandler);
 
+//subscribe user
+router.put("/subscribe/:id", varifyUser, userController.subscribeUserHandler);
+
 
 
 

@@ -5,9 +5,9 @@ export interface userResponse {
     _id: string;
     email: string;
     username: string;
-    img?: string;
-    subscripers?: number;
-    subscribtions?: string[];
+    img: string;
+    subscripers: number;
+    subscribtions: string[];
     createdAt: string;
 
 }
@@ -23,8 +23,8 @@ export interface UserInputs extends Document {
     username: string;
     password: string;
     img?: string;
-    subscripers?: number;
-    subscribtions?: string[];
+    subscripers: number;
+    subscribtions: string[];
 
 }
 
