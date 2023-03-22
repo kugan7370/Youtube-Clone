@@ -22,7 +22,7 @@ export interface UserInputs extends Document {
     email: string;
     username: string;
     password: string;
-    img?: string;
+    img: string;
     subscripers: number;
     subscribtions: string[];
 

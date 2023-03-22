@@ -1,6 +1,8 @@
-import { NextFunction, response } from "express";
+import { NextFunction } from "express";
+import { CommentResponces } from "../@types/comment_types";
 import { userUpdateProps } from "../@types/user_type";
 import { addVideoProps, videoUpdateProps } from "../@types/video_types";
+import User from "../Models/user_models";
 import Video from "../Models/video_models";
 
 
@@ -15,19 +17,57 @@ export const addVideo = async (video: addVideoProps, next: NextFunction) => {
     }
 }
 
-export const getAllVideo = async (next: NextFunction) => {
+export const getAllVideo = async (next: NextFunction, sortByViews?: boolean, randomVideos?: boolean) => {
     try {
-        const video = await Video.aggregate([{
-            $lookup: {
-                from: "users",
-                localField: "userId",
-                foreignField: "_id",
-                as: "userDetails"
-            }
-            //remove password from userDetails
-        }, { $unwind: "$userDetails" }, { $project: { "userDetails.password": 0 } }])
+        const videoPipeline = [
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "postedBy"
+                }
+            },
+            {
+                $lookup: {
+                    from: "comments",
+                    localField: "comments",
+                    foreignField: "_id",
+                    as: "commentDetails"
+                }
+            },
+            { $unwind: "$postedBy" },
+            { $project: { "postedBy.password": 0, "comments": 0, "userId": 0 } }
+        ];
 
+        if (sortByViews) {
+            videoPipeline.push({ $sort: { views: -1 } } as any);
+        }
+        if (randomVideos) {
+            videoPipeline.push({ $sample: { size: 10 } } as any);
+        }
 
+        const video = await Video.aggregate(videoPipeline);
+
+        if (video) {
+            await Promise.all(video.map(async (item) => {
+                if (item.commentDetails.length > 0) {
+                    await Promise.all(item.commentDetails.map(async (comments: CommentResponces) => {
+                        const getUserDetails = await User.findById(comments.userId).lean();
+
+                        if (getUserDetails) {
+                            comments.username = getUserDetails.username;
+                            comments.email = getUserDetails.email;
+                            if (getUserDetails.img) {
+                                comments.img = getUserDetails.img
+                            }
+                        }
+
+                    }))
+                }
+            }))
+
+        }
 
         return video;
     } catch (error) {
@@ -140,6 +180,58 @@ export const viewVideo = async (videoId: string, next: NextFunction) => {
     } catch (error) {
         throw next(error);
 
+    }
+
+}
+
+export const getTrendingVideo = async (next: NextFunction) => {
+    try {
+        const video = await Video.aggregate([{
+            $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "postedBy"
+            }
+        },
+        {
+            $lookup: {
+                from: "comments",
+                localField: "comments",
+                foreignField: "_id",
+                as: "commentDetails"
+
+            },
+        },
+        //sort by views
+        { $unwind: "$postedBy" }, { $project: { "postedBy.password": 0, "comments": 0, "userId": 0 } }, { $sort: { views: -1 } }])
+
+
+
+        if (video) {
+            await Promise.all(video.map(async (item) => {
+                if (item.commentDetails.length > 0) {
+                    await Promise.all(item.commentDetails.map(async (comments: CommentResponces) => {
+                        const getUserDetails = await User.findById(comments.userId).lean();
+
+                        if (getUserDetails) {
+                            comments.username = getUserDetails.username;
+                            comments.email = getUserDetails.email;
+                            if (getUserDetails.img) {
+                                comments.img = getUserDetails.img
+                            }
+                        }
+
+                    }))
+                }
+            }))
+
+        }
+
+        return video;
+
+    } catch (error) {
+        throw next(error);
     }
 
 }

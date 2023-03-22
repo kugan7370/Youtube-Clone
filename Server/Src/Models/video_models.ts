@@ -36,7 +36,8 @@ const videoSchema = new mongoose.Schema({
         type: [String]
     },
     comments: {
-        type: [String]
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "Comment",
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,

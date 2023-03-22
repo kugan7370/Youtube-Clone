@@ -26,6 +26,13 @@ router.put("/like/:id", varifyUser, videoController.likeVideoHandler);
 // view video
 router.put("/view/:id", varifyUser, videoController.viewVideoHandler);
 
+//get trending video
+router.get("/trending", videoController.getTrendingVideoHandler);
+
+// get random video
+router.get("/random", videoController.getRandomVideoHandler);
+
+
 
 
 
