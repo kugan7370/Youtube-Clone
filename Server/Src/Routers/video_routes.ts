@@ -32,6 +32,9 @@ router.get("/trending", videoController.getTrendingVideoHandler);
 // get random video
 router.get("/random", videoController.getRandomVideoHandler);
 
+//get user subcriptoin video
+router.get("/subscription", varifyUser, videoController.getSubscriptionVideoHandler);
+
 
 
 

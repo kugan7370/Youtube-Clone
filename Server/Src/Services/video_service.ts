@@ -1,4 +1,5 @@
-import { NextFunction } from "express";
+import { NextFunction, Request } from "express";
+import mongoose from "mongoose";
 import { CommentResponces } from "../@types/comment_types";
 import { userUpdateProps } from "../@types/user_type";
 import { addVideoProps, videoUpdateProps } from "../@types/video_types";
@@ -17,7 +18,8 @@ export const addVideo = async (video: addVideoProps, next: NextFunction) => {
     }
 }
 
-export const getAllVideo = async (next: NextFunction, sortByViews?: boolean, randomVideos?: boolean) => {
+export const getAllVideo = async (req: Request, next: NextFunction, sortByViews?: boolean, randomVideos?: boolean, userSubcription?: boolean) => {
+    const { user } = req.body;
     try {
         const videoPipeline = [
             {
@@ -45,6 +47,16 @@ export const getAllVideo = async (next: NextFunction, sortByViews?: boolean, ran
         }
         if (randomVideos) {
             videoPipeline.push({ $sample: { size: 10 } } as any);
+        }
+        if (userSubcription) {
+            // get user subscriptions
+            const userSubcriptionData = await User.findById(user._id)
+
+            if (!userSubcriptionData) throw new Error("User did not subscribe to any channel");
+            const userSubcriptions = userSubcriptionData?.subscribtions;
+            const changedTypes = userSubcriptions.map((item) => new mongoose.Types.ObjectId(item))
+            videoPipeline.push({ $match: { "postedBy._id": { $in: changedTypes } } } as any);
+
         }
 
         const video = await Video.aggregate(videoPipeline);
@@ -184,56 +196,6 @@ export const viewVideo = async (videoId: string, next: NextFunction) => {
 
 }
 
-export const getTrendingVideo = async (next: NextFunction) => {
-    try {
-        const video = await Video.aggregate([{
-            $lookup: {
-                from: "users",
-                localField: "userId",
-                foreignField: "_id",
-                as: "postedBy"
-            }
-        },
-        {
-            $lookup: {
-                from: "comments",
-                localField: "comments",
-                foreignField: "_id",
-                as: "commentDetails"
 
-            },
-        },
-        //sort by views
-        { $unwind: "$postedBy" }, { $project: { "postedBy.password": 0, "comments": 0, "userId": 0 } }, { $sort: { views: -1 } }])
-
-
-
-        if (video) {
-            await Promise.all(video.map(async (item) => {
-                if (item.commentDetails.length > 0) {
-                    await Promise.all(item.commentDetails.map(async (comments: CommentResponces) => {
-                        const getUserDetails = await User.findById(comments.userId).lean();
-
-                        if (getUserDetails) {
-                            comments.username = getUserDetails.username;
-                            comments.email = getUserDetails.email;
-                            if (getUserDetails.img) {
-                                comments.img = getUserDetails.img
-                            }
-                        }
-
-                    }))
-                }
-            }))
-
-        }
-
-        return video;
-
-    } catch (error) {
-        throw next(error);
-    }
-
-}
 
 
