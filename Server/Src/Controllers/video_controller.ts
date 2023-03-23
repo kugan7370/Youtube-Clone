@@ -126,3 +126,15 @@ export const getSubscriptionVideoHandler = async (req: Request, res: Response, n
     }
 
 }
+
+export const getSearchVideoHandler = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const video = await getAllVideo(req, next, false, false, false, true);
+        if (video) {
+            return res.status(201).json({ video })
+        }
+    } catch (error) {
+        return next(error);
+    }
+
+}

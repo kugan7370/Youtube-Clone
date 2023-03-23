@@ -35,6 +35,9 @@ router.get("/random", videoController.getRandomVideoHandler);
 //get user subcriptoin video
 router.get("/subscription", varifyUser, videoController.getSubscriptionVideoHandler);
 
+//get search video
+router.get("/search", videoController.getSearchVideoHandler);
+
 
 
 
