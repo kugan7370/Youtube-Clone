@@ -24,6 +24,18 @@ export const getAllVideoHandler = async (req: Request, res: Response, next: Next
     }
 
 }
+export const getVideoByIdHandler = async (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+        const video = await getAllVideo(req, next, false, false, false, false, true);
+        if (video) {
+            return res.status(201).json({ video })
+        }
+    } catch (error) {
+        return next(error);
+    }
+
+}
 
 export const getVideoByUserHandler = async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
@@ -138,3 +150,5 @@ export const getSearchVideoHandler = async (req: Request, res: Response, next: N
     }
 
 }
+
+

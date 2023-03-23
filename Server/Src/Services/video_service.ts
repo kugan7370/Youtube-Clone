@@ -18,7 +18,7 @@ export const addVideo = async (video: addVideoProps, next: NextFunction) => {
     }
 }
 
-export const getAllVideo = async (req: Request, next: NextFunction, sortByViews?: boolean, randomVideos?: boolean, userSubcription?: boolean, isSearch?: boolean) => {
+export const getAllVideo = async (req: Request, next: NextFunction, sortByViews?: boolean, randomVideos?: boolean, userSubcription?: boolean, isSearch?: boolean, isSingleVideo?: boolean) => {
     const { user } = req.body;
     try {
         const videoPipeline = [
@@ -61,6 +61,10 @@ export const getAllVideo = async (req: Request, next: NextFunction, sortByViews?
 
         if (isSearch) {
             videoPipeline.push({ $match: { title: { $regex: req.body.search, $options: "i" } } } as any);
+        }
+
+        if (isSingleVideo) {
+            videoPipeline.push({ $match: { _id: new mongoose.Types.ObjectId(req.params.videoId) } } as any);
         }
 
         const video = await Video.aggregate(videoPipeline);

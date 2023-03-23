@@ -11,13 +11,16 @@ router.post("/add", varifyUser, videoController.addVideoHandler);
 //get all videos
 router.get("/get-all", videoController.getAllVideoHandler);
 
-//get video by user
+// get video by id
+router.get("/get/:videoId", videoController.getVideoByIdHandler);
+
+//get video by user id
 router.get("/get-user/:id", videoController.getVideoByUserHandler);
 
-//update user
+//update video
 router.put("/update/:id", varifyUser, videoController.updateVideoHandler);
 
-//delete user
+//delete video
 router.delete("/delete/:id", varifyUser, videoController.deleteVideoHandler);
 
 //like video
