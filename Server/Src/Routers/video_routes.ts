@@ -15,7 +15,7 @@ router.get("/get-all", videoController.getAllVideoHandler);
 router.get("/get/:videoId", videoController.getVideoByIdHandler);
 
 //get video by user id
-router.get("/get-user/:id", videoController.getVideoByUserHandler);
+router.get("/yourVideos", varifyUser, videoController.getVideoByUserHandler);
 
 //update video
 router.put("/update/:id", varifyUser, videoController.updateVideoHandler);

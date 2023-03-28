@@ -42,7 +42,7 @@ export const loginUsers = async (userData: UserInputs, next: NextFunction) => {
   if (!password) return next(createError(400, "Password is required"));
 
   try {
-    const isUser = await User.findOne({ email })
+    const isUser = await User.findOne({ email }).populate("subscribtions")
     if (!isUser) {
       return next(createError(400, "user not found"));
     }
