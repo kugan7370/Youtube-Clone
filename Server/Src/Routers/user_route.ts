@@ -10,6 +10,9 @@ router.post("/register", userController.registerUserHandler);
 //login user
 router.post("/login", userController.loginUserHandler);
 
+//user logout
+router.get("/logout", userController.logoutUserHandler);
+
 //get all users
 router.get("/getAllUser", userController.getAllUserHandler);
 

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { addVideo, deleteVideo, getAllVideo, getVideoByUser, likedVideo, updateVideo, viewVideo } from "../Services/video_service";
+import { addVideo, deleteVideo, getAllVideo, getRandomVideos, getSearchVideos, getSubscriptionVideos, getTrendingVideos, getVideoByUser, likedVideo, updateVideo, viewVideo } from "../Services/video_service";
 
 export const addVideoHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -27,7 +27,7 @@ export const getAllVideoHandler = async (req: Request, res: Response, next: Next
 export const getVideoByIdHandler = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
-        const video = await getAllVideo(req, next, false, false, false, false, true);
+        const video = await getAllVideo(req, next, true);
         if (video) {
             return res.status(201).json({ video })
         }
@@ -36,7 +36,6 @@ export const getVideoByIdHandler = async (req: Request, res: Response, next: Nex
     }
 
 }
-
 
 
 export const updateVideoHandler = async (req: Request, res: Response, next: NextFunction) => {
@@ -95,7 +94,7 @@ export const viewVideoHandler = async (req: Request, res: Response, next: NextFu
 
 export const getTrendingVideoHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const video = await getAllVideo(req, next, true);
+        const video = await getTrendingVideos(next);
         if (video) {
             return res.status(201).json({ video })
         }
@@ -106,7 +105,7 @@ export const getTrendingVideoHandler = async (req: Request, res: Response, next:
 }
 export const getRandomVideoHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const video = await getAllVideo(req, next, false, true);
+        const video = await getRandomVideos(next);
         if (video) {
             return res.status(201).json({ video })
         }
@@ -118,7 +117,7 @@ export const getRandomVideoHandler = async (req: Request, res: Response, next: N
 
 export const getSubscriptionVideoHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const video = await getAllVideo(req, next, false, false, true);
+        const video = await getSubscriptionVideos(req, next);
         if (video) {
             return res.status(201).json({ video })
         }
@@ -130,7 +129,7 @@ export const getSubscriptionVideoHandler = async (req: Request, res: Response, n
 
 export const getSearchVideoHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const video = await getAllVideo(req, next, false, false, false, true);
+        const video = await getSearchVideos(req, next);
         if (video) {
             return res.status(201).json({ video })
         }
@@ -143,7 +142,7 @@ export const getSearchVideoHandler = async (req: Request, res: Response, next: N
 export const getVideoByUserHandler = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
-        const video = await getAllVideo(req, next, false, false, false, false, false, true);
+        const video = await getVideoByUser(req, next);
         if (video) {
             return res.status(201).json({ video })
         }

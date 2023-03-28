@@ -36,6 +36,7 @@ export const loginUserHandler = async (req: Request, res: Response, next: NextFu
 
 }
 
+
 export const updateUserHandler = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params
   try {
@@ -113,4 +114,9 @@ export const subscribeUserHandler = async (req: Request, res: Response, next: Ne
     return next(error);
 
   }
+}
+
+export const logoutUserHandler = async (req: Request, res: Response) => {
+  res.clearCookie("access_token");
+  return res.json({ success: true, message: "Logout success" });
 }

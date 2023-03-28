@@ -18,8 +18,8 @@ export const addVideo = async (video: addVideoProps, next: NextFunction) => {
     }
 }
 
-export const getAllVideo = async (req: Request, next: NextFunction, sortByViews?: boolean, randomVideos?: boolean, userSubcription?: boolean, isSearch?: boolean, isSingleVideo?: boolean, isUserVideo?: boolean) => {
-    const { user } = req.body;
+export const getAllVideo = async (req: Request, next: NextFunction, isSingleVideo?: boolean) => {
+
     try {
         const videoPipeline = [
             {
@@ -42,33 +42,10 @@ export const getAllVideo = async (req: Request, next: NextFunction, sortByViews?
             { $project: { "postedBy.password": 0, "comments": 0, "userId": 0 } }
         ];
 
-        if (sortByViews) {
-            videoPipeline.push({ $sort: { views: -1 } } as any);
-        }
-        if (randomVideos) {
-            videoPipeline.push({ $sample: { size: 10 } } as any);
-        }
-        if (userSubcription) {
-            // get user subscriptions
-            const userSubcriptionData = await User.findById(user._id)
-
-            if (!userSubcriptionData) throw new Error("User did not subscribe to any channel");
-            const userSubcriptions = userSubcriptionData?.subscribtions;
-            const changedTypes = userSubcriptions.map((item) => new mongoose.Types.ObjectId(item))
-            videoPipeline.push({ $match: { "postedBy._id": { $in: changedTypes } } } as any);
-
-        }
-
-        if (isSearch) {
-            videoPipeline.push({ $match: { title: { $regex: req.body.search, $options: "i" } } } as any);
-        }
-
         if (isSingleVideo) {
             videoPipeline.push({ $match: { _id: new mongoose.Types.ObjectId(req.params.videoId) } } as any);
         }
-        if (isUserVideo) {
-            videoPipeline.push({ $match: { "postedBy._id": user._id } } as any);
-        }
+
 
         const video = await Video.aggregate(videoPipeline);
 
@@ -98,31 +75,6 @@ export const getAllVideo = async (req: Request, next: NextFunction, sortByViews?
     }
 }
 
-
-export const getVideoByUser = async (userId: string, next: NextFunction) => {
-    try {
-
-        const video = await Video.find({ userId }).populate("userId", "-password -_id -createdAt -updatedAt -__v").lean();
-        if (video) {
-            const updatedVideo = video.map((item) => {
-                const { userId, ...rest } = item
-                return {
-                    ...rest,
-                    userDetails: userId,
-                };
-            });
-            return updatedVideo;
-            // !! in here i have used lean() to get the data in json format
-            // !! if not i need to use item.toObject() to get the data in json format
-
-        }
-
-
-    } catch (error) {
-        throw next(error);
-    }
-
-}
 
 export const updateVideo = async (VideoId: string, video: videoUpdateProps, next: NextFunction) => {
     const { user, ...rest } = video;
@@ -206,6 +158,149 @@ export const viewVideo = async (videoId: string, next: NextFunction) => {
     }
 
 }
+
+export const getTrendingVideos = async (next: NextFunction) => {
+    try {
+        const getVideo = await Video.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            { $unwind: "$userDetails" },
+            { $project: { "userDetails.password": 0, "userId": 0 } },
+            { $sort: { views: -1 } },
+
+        ]);
+
+        return getVideo;
+
+
+    } catch (error) {
+        throw next(error);
+    }
+
+}
+
+export const getRandomVideos = async (next: NextFunction) => {
+    try {
+        const getVideo = await Video.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            { $unwind: "$userDetails" },
+            { $project: { "userDetails.password": 0, "userId": 0 } },
+            { $sample: { size: 10 } },
+
+        ]);
+
+        return getVideo;
+
+    }
+    catch (error) {
+        throw next(error);
+    }
+}
+
+export const getSubscriptionVideos = async (req: Request, next: NextFunction) => {
+    const { user } = req.body
+
+    try {
+
+        // get user subscriptions
+        const userSubcriptionData = await User.findById(user._id)
+
+        if (!userSubcriptionData) throw new Error("User did not subscribe to any channel");
+        const userSubcriptions = userSubcriptionData?.subscribtions;
+        const changedTypes = userSubcriptions.map((item) => new mongoose.Types.ObjectId(item))
+
+
+        const getVideo = await Video.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            { $unwind: "$userDetails" },
+            { $project: { "userDetails.password": 0, "userId": 0 } },
+            { $match: { "userDetails._id": { $in: changedTypes } } },
+            { $sort: { createdAt: -1 } },
+
+        ]);
+
+        return getVideo;
+
+    } catch (error) {
+        throw next(error);
+    }
+
+}
+
+export const getSearchVideos = async (req: Request, next: NextFunction) => {
+
+    try {
+        const getVideo = await Video.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            { $unwind: "$userDetails" },
+            { $project: { "userDetails.password": 0, "userId": 0 } },
+            { $match: { title: { $regex: req.body.search, $options: "i" } } },
+            { $sort: { createdAt: -1 } },
+
+        ]);
+
+        return getVideo;
+
+    } catch (error) {
+        throw next(error);
+    }
+
+}
+
+export const getVideoByUser = async (req: Request, next: NextFunction) => {
+    try {
+        const getVideo = await Video.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            { $unwind: "$userDetails" },
+            { $project: { "userDetails.password": 0, "userId": 0 } },
+            { $match: { "userDetails._id": new mongoose.Types.ObjectId(req.body.user._id) } },
+            { $sort: { createdAt: -1 } },
+
+        ]);
+
+        return getVideo;
+
+    } catch (error) {
+        throw next(error);
+    }
+
+}
+
+
 
 
 

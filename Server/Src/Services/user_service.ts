@@ -122,7 +122,7 @@ export const getUserById = async (id: string, next: NextFunction) => {
 
 export const subscribtions = async (id: string, userDetails: userResponse, next: NextFunction) => {
   try {
-    const user = await User.findById(userDetails);
+    const user = await User.findById(userDetails._id);
     const userSubscripers = await User.findById(id);
 
     let message = ''
