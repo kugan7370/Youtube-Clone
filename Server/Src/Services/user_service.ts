@@ -1,10 +1,12 @@
-import { NextFunction } from "express";
+import { NextFunction, Request } from "express";
 import { UserInputs, userResponse, userUpdateProps } from "../@types/user_type";
 import User from "../Models/user_models";
 import bcrypt from "bcrypt";
 import createError from "../Utils/createError";
 import jwt from "jsonwebtoken";
 import env from "../Utils/env-valid";
+import mongoose from "mongoose";
+import Video from "../Models/video_models";
 
 
 export const hashPassword = async (password: string) => {
@@ -160,5 +162,36 @@ export const subscribtions = async (id: string, userDetails: userResponse, next:
   }
 
 }
+
+export const addVideoToHistory = async (req: Request, videoId: string, next: NextFunction) => {
+  const { user: users } = req.body;
+
+  try {
+    const user = await User.findById(users._id);
+    if (user) {
+      if (user.history.some((item) => item.videoId == videoId)) {
+        user.history = user.history.map((item) => {
+          if (item.videoId == videoId) {
+            item.date = new Date();
+          }
+          return item;
+        })
+      }
+      else {
+        user.history.push({ videoId, date: new Date() });
+
+      }
+      await user.save();
+
+      return user;
+    }
+  } catch (error) {
+    throw next(error);
+  }
+}
+
+
+
+
 
 

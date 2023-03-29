@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { createUser, deleteUser, getUserById, getUsers, loginUsers, subscribtions, updateUser, } from "../Services/user_service";
+import { addVideoToHistory, createUser, deleteUser, getUserById, getUsers, loginUsers, subscribtions, updateUser, } from "../Services/user_service";
 
 
 export const registerUserHandler = async (req: Request, res: Response, next: NextFunction) => {
@@ -120,3 +120,23 @@ export const logoutUserHandler = async (req: Request, res: Response) => {
   res.clearCookie("access_token");
   return res.json({ success: true, message: "Logout success" });
 }
+
+
+export const videoHistoryHandler = async (req: Request, res: Response, next: NextFunction) => {
+  const { id } = req.params
+  try {
+    const addVideo = await addVideoToHistory(req, id, next);
+    if (addVideo) {
+      return res
+        .status(201)
+        .json({ message: "Video added to history" });
+    }
+
+  } catch (error) {
+    return next(error);
+
+  }
+}
+
+
+

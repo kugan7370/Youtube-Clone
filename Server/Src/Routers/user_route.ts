@@ -28,6 +28,16 @@ router.delete("/delete", varifyUser, userController.deleteUserHandler);
 //subscribe user
 router.put("/subscribe/:id", varifyUser, userController.subscribeUserHandler);
 
+//add video history
+router.put("/history/:id", varifyUser, userController.videoHistoryHandler);
+
+
+
+
+
+
+
+
 
 
 

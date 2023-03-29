@@ -41,6 +41,16 @@ router.get("/subscription", varifyUser, videoController.getSubscriptionVideoHand
 //get search video
 router.get("/search", videoController.getSearchVideoHandler);
 
+//get liked video
+router.get("/get-liked", varifyUser, videoController.getLikedVideoHandler);
+
+//get viewed video
+router.get("/get-viewed", varifyUser, videoController.getViewedVideoHandler);
+
+
+
+
+
 
 
 

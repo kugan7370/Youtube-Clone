@@ -8,7 +8,9 @@ export interface userResponse {
     img: string;
     subscripers: number;
     subscribtions: string[];
+    history: History[];
     createdAt: string;
+
 
 }
 
@@ -23,8 +25,15 @@ export interface UserInputs extends Document {
     username: string;
     password: string;
     img: string;
+    history: History[];
     subscripers: number;
     subscribtions: string[];
 
 }
+
+export interface History {
+    videoId: string;
+    date: Date;
+}
+
 

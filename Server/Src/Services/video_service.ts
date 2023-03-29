@@ -1,7 +1,7 @@
 import { NextFunction, Request } from "express";
-import mongoose from "mongoose";
+import mongoose, { Date } from "mongoose";
 import { CommentResponces } from "../@types/comment_types";
-import { userUpdateProps } from "../@types/user_type";
+import { History, userUpdateProps } from "../@types/user_type";
 import { addVideoProps, videoUpdateProps } from "../@types/video_types";
 import User from "../Models/user_models";
 import Video from "../Models/video_models";
@@ -114,7 +114,7 @@ export const likedVideo = async (videoId: string, user: userUpdateProps, next: N
                 video.likedBy = video.likedBy.filter((like) => like.toString() !== user.user._id.toString());
                 video.likes = video.likes - 1;
                 video.dislikes = video.dislikes + 1;
-                video.dislikedBy.push(user.user._id);
+                video.dislikedBy.push(new mongoose.Types.ObjectId(user.user._id));
                 await video.save();
                 message = "disliked successfully";
             }
@@ -122,12 +122,12 @@ export const likedVideo = async (videoId: string, user: userUpdateProps, next: N
                 video.dislikedBy = video.dislikedBy.filter((dislike) => dislike.toString() !== user.user._id.toString());
                 video.dislikes = video.dislikes - 1;
                 video.likes = video.likes + 1;
-                video.likedBy.push(user.user._id);
+                video.likedBy.push(new mongoose.Types.ObjectId(user.user._id));
                 await video.save();
                 message = "liked successfully";
             }
             if (!isLiked && !isDisliked) {
-                video.likedBy.push(user.user._id);
+                video.likedBy.push(new mongoose.Types.ObjectId(user.user._id));
                 video.likes = video.likes + 1;
                 await video.save();
                 message = "liked successfully";
@@ -299,6 +299,77 @@ export const getVideoByUser = async (req: Request, next: NextFunction) => {
     }
 
 }
+
+export const getLikedVideos = async (req: Request, next: NextFunction) => {
+
+    try {
+        const getVideo = await Video.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            { $unwind: "$userDetails" },
+            { $project: { "userDetails.password": 0, "userId": 0 } },
+            { $match: { "likedBy": new mongoose.Types.ObjectId(req.body.user._id) } },
+            { $sort: { createdAt: -1 } },
+
+        ]);
+
+        return getVideo;
+
+    } catch (error) {
+        throw next(error);
+    }
+
+}
+
+export const getViewVideos = async (req: Request, next: NextFunction) => {
+    const { user } = req.body
+    if (user.history.length === 0) throw new Error("No history found")
+    try {
+        const getVideos = await User.aggregate([
+            { $match: { _id: user._id } },
+            { $unwind: '$history' },
+            {
+                $lookup: {
+                    from: 'videos',
+                    localField: 'history.videoId',
+                    foreignField: '_id',
+                    as: 'video'
+                }
+            },
+            { $unwind: '$video' },
+            { $sort: { 'history.date': -1 } },
+
+            { $project: { "video": 1, } },
+        ]);
+        if (getVideos.length === 0) throw new Error("No history found")
+        const result = await Promise.all(getVideos.map(async (item: any) => {
+            const userDetails = await User.findById(item.video.userId)
+            return {
+                ...item.video,
+                userDetails: {
+                    username: userDetails?.username,
+                    img: userDetails?.img,
+                }
+            }
+        }))
+
+        return result;
+
+    }
+
+    catch (error) {
+        throw next(error);
+    }
+
+}
+
+
 
 
 
