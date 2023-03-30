@@ -1,7 +1,7 @@
 import { NextFunction, Request } from "express";
-import mongoose, { Date } from "mongoose";
+import mongoose from "mongoose";
 import { CommentResponces } from "../@types/comment_types";
-import { History, userUpdateProps } from "../@types/user_type";
+import { userUpdateProps } from "../@types/user_type";
 import { addVideoProps, videoUpdateProps } from "../@types/video_types";
 import User from "../Models/user_models";
 import Video from "../Models/video_models";
@@ -368,6 +368,45 @@ export const getViewVideos = async (req: Request, next: NextFunction) => {
     }
 
 }
+
+
+export const getRecommendedVideos = async (req: Request, next: NextFunction) => {
+    const { id } = req.params
+
+    try {
+        const getVideoDetails = await Video.findById(id)
+        if (!getVideoDetails) throw new Error("No video found")
+        const getTags = getVideoDetails.tags
+
+        const getVideo = await Video.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userDetails"
+                }
+            },
+            { $unwind: "$userDetails" },
+            { $project: { "userDetails.password": 0, "userId": 0 } },
+            { $match: { "tags": { $in: getTags } } },
+            { $sort: { createdAt: -1 } },
+
+        ]);
+        //remove the current video
+        const result = getVideo.filter((item) => item._id.toString() !== id)
+
+        return result;
+
+
+    }
+    catch (error) {
+        throw next(error);
+    }
+
+}
+
+
 
 
 

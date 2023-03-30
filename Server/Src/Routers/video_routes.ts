@@ -47,6 +47,9 @@ router.get("/get-liked", varifyUser, videoController.getLikedVideoHandler);
 //get viewed video
 router.get("/get-viewed", varifyUser, videoController.getViewedVideoHandler);
 
+//get recommended video
+router.get("/get-recommended/:id", varifyUser, videoController.getRecommendedVideoHandler);
+
 
 
 
