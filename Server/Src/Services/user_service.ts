@@ -136,20 +136,25 @@ export const subscribtions = async (id: string, userDetails: userResponse, next:
 
 
           userSubscripers.subscripers = userSubscripers.subscripers - 1;
+          userSubscripers.subscripersId = userSubscripers.subscripersId.filter((item) => item.toString() != userDetails._id);
           await userSubscripers.save();
 
           message = 'unsubscribed successfully';
         }
         else {
-          user.subscribtions.push(id);
-          await user.save();
+          if (!user.subscribtions.includes(id) && !userSubscripers.subscripersId.includes(userDetails._id)) {
 
-          userSubscripers.subscripers = userSubscripers.subscripers + 1;
-          await userSubscripers.save();
 
-          message = 'subscribed successfully';
+            user.subscribtions.push(id);
+            await user.save();
+
+            userSubscripers.subscripers = userSubscripers.subscripers + 1;
+            userSubscripers.subscripersId.push(userDetails._id);
+            await userSubscripers.save();
+
+            message = 'subscribed successfully';
+          }
         }
-
         return message;
       }
 

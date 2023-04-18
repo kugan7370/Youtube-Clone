@@ -8,6 +8,7 @@ export interface userResponse {
     img: string;
     subscripers: number;
     subscribtions: string[];
+    subscripersId: string[];
     history: History[];
     createdAt: string;
 
@@ -28,6 +29,8 @@ export interface UserInputs extends Document {
     history: History[];
     subscripers: number;
     subscribtions: string[];
+    subscripersId: string[];
+
 
 }
 

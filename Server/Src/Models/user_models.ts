@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    subscripersId: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "User",
+    },
     subscribtions: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: "User",

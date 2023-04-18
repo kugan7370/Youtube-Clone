@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { addVideo, deleteVideo, disLikedVideo, getAllVideo, getdisLikedVideosIds, getLikedVideos, getLikedVideosIds, getRandomVideos, getRecommendedVideos, getSearchVideos, getSubscriptionVideos, getTrendingVideos, getVideoByUser, getViewVideos, likedVideo, updateVideo, viewVideo } from "../Services/video_service";
+import { addVideo, deleteVideo, disLikedVideo, getAllVideo, getdisLikedVideosIds, getLikedVideos, getLikedVideosIds, getRandomVideos, getRecommendedVideos, getSearchVideos, getSubscriptionVideos, getTrendingVideos, getVideoByUser, getVideoSubscritionIds, getViewVideos, likedVideo, updateVideo, viewVideo } from "../Services/video_service";
 
 export const addVideoHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -220,6 +220,18 @@ export const getDislikedVideoIdHandler = async (req: Request, res: Response, nex
 
     try {
         const video = await getdisLikedVideosIds(req, next);
+        if (video) {
+            return res.status(201).json({ video })
+        }
+    } catch (error) {
+        return next(error);
+    }
+
+}
+export const getSubscribtionIdsHandler = async (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+        const video = await getVideoSubscritionIds(req, next);
         if (video) {
             return res.status(201).json({ video })
         }

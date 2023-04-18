@@ -478,6 +478,37 @@ export const getdisLikedVideosIds = async (req: Request, next: NextFunction) => 
 
 }
 
+export const getVideoSubscritionIds = async (req: Request, next: NextFunction) => {
+    const { videoId } = req.params
+
+    try {
+        const getVideo = await Video.findById(videoId)
+        if (getVideo) {
+            const getUserSubscriptions = await User.findById(getVideo.userId)
+            if (getUserSubscriptions) {
+                console.log(getUserSubscriptions);
+
+                const subcriptionIds: string[] = []
+                getUserSubscriptions.subscripersId.map((item) => {
+                    subcriptionIds.push(item.toString())
+                })
+                return subcriptionIds;
+            }
+
+
+        }
+        else {
+            throw new Error("No video found")
+        }
+
+
+
+    } catch (error) {
+        throw next(error);
+    }
+
+}
+
 
 
 

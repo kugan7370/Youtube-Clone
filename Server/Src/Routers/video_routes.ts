@@ -59,7 +59,8 @@ router.get("/get-liked-userId/:videoId", varifyUser, videoController.getLikedVid
 // get disliked video id
 router.get("/get-disliked-userId/:videoId", varifyUser, videoController.getDislikedVideoIdHandler);
 
-
+//get subscribtion ids of user
+router.get("/get-subscribtion-ids/:videoId", varifyUser, videoController.getSubscribtionIdsHandler);
 
 
 
