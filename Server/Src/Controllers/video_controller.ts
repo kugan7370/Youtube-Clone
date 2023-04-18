@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { addVideo, deleteVideo, getAllVideo, getLikedVideos, getRandomVideos, getRecommendedVideos, getSearchVideos, getSubscriptionVideos, getTrendingVideos, getVideoByUser, getViewVideos, likedVideo, updateVideo, viewVideo } from "../Services/video_service";
+import { addVideo, deleteVideo, disLikedVideo, getAllVideo, getdisLikedVideosIds, getLikedVideos, getLikedVideosIds, getRandomVideos, getRecommendedVideos, getSearchVideos, getSubscriptionVideos, getTrendingVideos, getVideoByUser, getViewVideos, likedVideo, updateVideo, viewVideo } from "../Services/video_service";
 
 export const addVideoHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -70,6 +70,19 @@ export const likeVideoHandler = async (req: Request, res: Response, next: NextFu
 
     try {
         const video = await likedVideo(id, req.body, next);
+        if (video) {
+            return res.status(201).json({ message: video.message })
+        }
+
+    } catch (error) {
+        return next(error);
+    }
+}
+export const disLikeVideoHandler = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    try {
+        const video = await disLikedVideo(id, req.body, next);
         if (video) {
             return res.status(201).json({ message: video.message })
         }
@@ -182,6 +195,31 @@ export const getRecommendedVideoHandler = async (req: Request, res: Response, ne
 
     try {
         const video = await getRecommendedVideos(req, next);
+        if (video) {
+            return res.status(201).json({ video })
+        }
+    } catch (error) {
+        return next(error);
+    }
+
+}
+
+export const getLikedVideoIdHandler = async (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+        const video = await getLikedVideosIds(req, next);
+        if (video) {
+            return res.status(201).json({ video })
+        }
+    } catch (error) {
+        return next(error);
+    }
+
+}
+export const getDislikedVideoIdHandler = async (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+        const video = await getdisLikedVideosIds(req, next);
         if (video) {
             return res.status(201).json({ video })
         }

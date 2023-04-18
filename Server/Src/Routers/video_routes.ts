@@ -26,6 +26,9 @@ router.delete("/delete/:id", varifyUser, videoController.deleteVideoHandler);
 //like video
 router.put("/like/:id", varifyUser, videoController.likeVideoHandler);
 
+//disLike video
+router.put("/dislike/:id", varifyUser, videoController.disLikeVideoHandler);
+
 // view video
 router.put("/view/:id", varifyUser, videoController.viewVideoHandler);
 
@@ -48,9 +51,13 @@ router.get("/get-liked", varifyUser, videoController.getLikedVideoHandler);
 router.get("/get-viewed", varifyUser, videoController.getViewedVideoHandler);
 
 //get recommended video
-router.get("/get-recommended/:id", varifyUser, videoController.getRecommendedVideoHandler);
+router.get("/get-recommended/:id", videoController.getRecommendedVideoHandler);
 
+//get liked video Id
+router.get("/get-liked-userId/:videoId", varifyUser, videoController.getLikedVideoIdHandler);
 
+// get disliked video id
+router.get("/get-disliked-userId/:videoId", varifyUser, videoController.getDislikedVideoIdHandler);
 
 
 

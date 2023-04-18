@@ -110,27 +110,59 @@ export const likedVideo = async (videoId: string, user: userUpdateProps, next: N
             const isLiked = video.likedBy.find((like) => like.toString() === user.user._id.toString());
             const isDisliked = video.dislikedBy.find((dislike) => dislike.toString() === user.user._id.toString());
             if (isLiked) {
-                //remove isLiked from likedBy array
                 video.likedBy = video.likedBy.filter((like) => like.toString() !== user.user._id.toString());
                 video.likes = video.likes - 1;
+                await video.save();
+                message = "disliked successfully";
+            }
+            else {
+                if (isDisliked) {
+                    video.dislikedBy = video.dislikedBy.filter((dislike) => dislike.toString() !== user.user._id.toString());
+                    video.dislikes = video.dislikes - 1;
+                }
+                video.likedBy.push(new mongoose.Types.ObjectId(user.user._id));
+                video.likes = video.likes + 1;
+                await video.save();
+                message = "liked successfully";
+
+            }
+
+
+
+
+        }
+        return { video, message };
+
+    } catch (error) {
+        throw next(error);
+    }
+
+}
+export const disLikedVideo = async (videoId: string, user: userUpdateProps, next: NextFunction) => {
+
+
+    try {
+        const video = await Video.findById(videoId);
+        let message = "";
+        if (video) {
+            const isLiked = video.likedBy.find((like) => like.toString() === user.user._id.toString());
+            const isDisliked = video.dislikedBy.find((dislike) => dislike.toString() === user.user._id.toString());
+
+            if (isDisliked) {
+                video.dislikedBy = video.dislikedBy.filter((dislike) => dislike.toString() !== user.user._id.toString());
+                video.dislikes = video.dislikes - 1;
+                await video.save();
+                message = "liked successfully";
+            }
+            else {
+                if (isLiked) {
+                    video.likedBy = video.likedBy.filter((like) => like.toString() !== user.user._id.toString());
+                    video.likes = video.likes - 1;
+                }
                 video.dislikes = video.dislikes + 1;
                 video.dislikedBy.push(new mongoose.Types.ObjectId(user.user._id));
                 await video.save();
                 message = "disliked successfully";
-            }
-            if (isDisliked) {
-                video.dislikedBy = video.dislikedBy.filter((dislike) => dislike.toString() !== user.user._id.toString());
-                video.dislikes = video.dislikes - 1;
-                video.likes = video.likes + 1;
-                video.likedBy.push(new mongoose.Types.ObjectId(user.user._id));
-                await video.save();
-                message = "liked successfully";
-            }
-            if (!isLiked && !isDisliked) {
-                video.likedBy.push(new mongoose.Types.ObjectId(user.user._id));
-                video.likes = video.likes + 1;
-                await video.save();
-                message = "liked successfully";
             }
 
 
@@ -142,6 +174,8 @@ export const likedVideo = async (videoId: string, user: userUpdateProps, next: N
     }
 
 }
+
+
 
 export const viewVideo = async (videoId: string, next: NextFunction) => {
     try {
@@ -348,7 +382,7 @@ export const getViewVideos = async (req: Request, next: NextFunction) => {
             { $project: { "video": 1, } },
         ]);
         if (getVideos.length === 0) throw new Error("No history found")
-        const result = await Promise.all(getVideos.map(async (item: any) => {
+        const result = await Promise.all(getVideos.map(async (item) => {
             const userDetails = await User.findById(item.video.userId)
             return {
                 ...item.video,
@@ -401,6 +435,44 @@ export const getRecommendedVideos = async (req: Request, next: NextFunction) => 
 
     }
     catch (error) {
+        throw next(error);
+    }
+
+}
+
+export const getLikedVideosIds = async (req: Request, next: NextFunction) => {
+    const { videoId } = req.params
+
+    try {
+        const getVideo = await Video.findById(videoId)
+        const videoIds: string[] = []
+        if (getVideo) {
+            getVideo.likedBy.map((item) => {
+                videoIds.push(item.toString())
+            })
+        }
+        return videoIds;
+
+    } catch (error) {
+        throw next(error);
+    }
+
+}
+
+export const getdisLikedVideosIds = async (req: Request, next: NextFunction) => {
+    const { videoId } = req.params
+
+    try {
+        const getVideo = await Video.findById(videoId)
+        const videoIds: string[] = []
+        if (getVideo) {
+            getVideo.dislikedBy.map((item) => {
+                videoIds.push(item.toString())
+            })
+        }
+        return videoIds;
+
+    } catch (error) {
         throw next(error);
     }
 
