@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { addComment, deleteComment, getcomment } from "../Services/comment_service";
+import { addComment, deleteComment, getCommentByVideoId, getcomment } from "../Services/comment_service";
 
 export const addCommentHandler = async (req: Request, res: Response, next: NextFunction) => {
     const { user, ...Comment } = req.body
@@ -33,6 +33,19 @@ export const deleteCommentHandler = async (req: Request, res: Response, next: Ne
         const comment = await deleteComment(id, _id, next);
         if (comment) {
             return res.status(201).json({ message: "Comment deleted successfully" })
+        }
+    } catch (error) {
+        return next(error);
+    }
+
+}
+
+export const getCommentByVideoIdHandler = async (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+        const comment = await getCommentByVideoId(req, next);
+        if (comment) {
+            return res.status(201).json({ comment })
         }
     } catch (error) {
         return next(error);

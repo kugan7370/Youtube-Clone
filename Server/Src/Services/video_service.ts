@@ -486,7 +486,7 @@ export const getVideoSubscritionIds = async (req: Request, next: NextFunction) =
         if (getVideo) {
             const getUserSubscriptions = await User.findById(getVideo.userId)
             if (getUserSubscriptions) {
-                console.log(getUserSubscriptions);
+
 
                 const subcriptionIds: string[] = []
                 getUserSubscriptions.subscripersId.map((item) => {

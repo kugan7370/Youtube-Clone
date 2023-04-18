@@ -12,6 +12,8 @@ router.post("/addComment", varifyUser, commentController.addCommentHandler);
 //get all comments
 router.get("/getComment", varifyUser, commentController.getCommentHandler);
 
+//get comment by video id
+router.get("/getCommentByVideoId/:videoId", varifyUser, commentController.getCommentByVideoIdHandler);
 
 //delete user
 router.delete("/deleteComment/:id", varifyUser, commentController.deleteCommentHandler);

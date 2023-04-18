@@ -1,8 +1,9 @@
-import { NextFunction } from "express";
+import { NextFunction, Request } from "express";
 import { CommentInput } from "../@types/comment_types";
 import Comment from "../Models/comments_models";
 import Video from "../Models/video_models";
 import createError from "../Utils/createError";
+import User from "../Models/user_models";
 
 
 export const addComment = async (comment: CommentInput, userId: string, next: NextFunction) => {
@@ -75,4 +76,30 @@ export const deleteComment = async (commentId: string, userId: string, next: Nex
         throw next(error);
     }
 
+}
+
+export const getCommentByVideoId = async (req: Request, next: NextFunction) => {
+    const { videoId } = req.params;
+    try {
+        const comment = await Comment.find({ videoId }).sort({ createdAt: -1 }).lean();
+        if (comment) {
+            const result = await Promise.all(comment.map(async (item) => {
+                const userDetails = await User.findById(item.userId)
+                if (!userDetails) return next(createError(404, "User not found"))
+                return {
+                    ...item,
+                    username: userDetails.username,
+                    email: userDetails.email,
+                    img: userDetails.img,
+                }
+
+            }))
+            return result;
+        }
+
+
+
+    } catch (error) {
+        throw next(error);
+    }
 }
