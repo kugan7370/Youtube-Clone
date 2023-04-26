@@ -6,7 +6,8 @@
   "scripts": {
     "start": "nodemon ./Src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --ext .ts"
+    "lint": "eslint --ext .ts",
+    "build": "cd backend && yarn install && yarn build"
   },
   
   "author": "",
