@@ -6,6 +6,9 @@ import router from "./Routers/index";
 import { CustomError } from "./Utils/createError";
 import handleMongooseError from "./Utils/mongoooseError";
 import cors from "cors";
+import morgan from "morgan";
+
+
 
 const app = Express();
 
@@ -15,6 +18,7 @@ const app = Express();
 app.use(Express.json());
 app.use(cookieParser());
 app.use(cors());
+app.use(morgan("dev"));
 
 
 
