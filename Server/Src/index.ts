@@ -5,7 +5,7 @@ import DB_Connect from "./DB/index";
 import router from "./Routers/index";
 import { CustomError } from "./Utils/createError";
 import handleMongooseError from "./Utils/mongoooseError";
-
+import cors from "cors";
 
 const app = Express();
 
@@ -14,6 +14,8 @@ const app = Express();
 //middleware
 app.use(Express.json());
 app.use(cookieParser());
+app.use(cors());
+
 
 
 //routes
@@ -25,11 +27,11 @@ app.use("/api", router);
 app.use(handleMongooseError);
 
 //error handling
-app.use((err:CustomError, req:Request, res:Response, next:NextFunction) => {
+app.use((err: CustomError, req: Request, res: Response, next: NextFunction) => {
     const statusCode = err.status || 500;
     const message = err.message || "Something went wrong";
-   return res.status(statusCode).json({ status:false,message, statusCode, });
-    
+    return res.status(statusCode).json({ status: false, message, statusCode, });
+
 })
 
 app.listen(env.PORT, () => {
