@@ -18,7 +18,11 @@ const app = Express();
 app.use(Express.json());
 app.use(cookieParser());
 app.use(cors());
-app.use(morgan("dev"));
+
+// logger
+const logFormat = '[:date[iso]] :method :url :status :response-time ms - :res[content-length]';
+
+app.use(morgan(logFormat));
 
 
 
