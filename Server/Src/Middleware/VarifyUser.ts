@@ -7,7 +7,7 @@ import envValid from "../Utils/env-valid";
 
 
 export const varifyUser = async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.cookies.access_token;
+    const token = await req.cookies.access_token;
     console.log("check===========>", req.cookies);
 
     if (!token) {
