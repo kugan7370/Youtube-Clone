@@ -26,9 +26,6 @@ export const loginUserHandler = async (req: Request, res: Response, next: NextFu
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
         httpOnly: true,
         secure: true,
-
-
-
       }).json({ success: true, message: "Login success", user: userData.user, token: userData.token });
 
     }
