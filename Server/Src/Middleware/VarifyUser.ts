@@ -51,6 +51,8 @@ export const varifyUser = async (req: Request, res: Response, next: NextFunction
         }
         req.body.user = user;
 
+
+
         next();
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError) {

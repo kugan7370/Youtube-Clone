@@ -1,12 +1,13 @@
 import Express from "express";
 import { varifyUser } from "../Middleware/VarifyUser";
 import * as videoController from "../Controllers/video_controller";
+import { uploadVideo } from "../Middleware/uploadVideo";
 
 
 const router = Express.Router();
 
 //create video
-router.post("/add", varifyUser, videoController.addVideoHandler);
+router.post("/add/:userId", varifyUser, uploadVideo.fields([{ name: 'video', maxCount: 1 }, { name: 'thumbnail', maxCount: 1 }]), videoController.addVideoHandler);
 
 //get all videos
 router.get("/get-all", videoController.getAllVideoHandler);

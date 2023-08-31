@@ -3,7 +3,7 @@ import { addVideo, deleteVideo, disLikedVideo, getAllVideo, getdisLikedVideosIds
 
 export const addVideoHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const video = await addVideo(req.body, next);
+        const video = await addVideo(req, next);
         if (video) {
             return res.status(201).json({ message: "Video added successfully", video })
         }

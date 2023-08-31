@@ -5,12 +5,37 @@ import { userUpdateProps } from "../@types/user_type";
 import { addVideoProps, videoUpdateProps } from "../@types/video_types";
 import User from "../Models/user_models";
 import Video from "../Models/video_models";
+import { uploadFileToCloud, uploadVideoToCloud } from "../Utils/cloudinary";
 
 
-export const addVideo = async (video: addVideoProps, next: NextFunction) => {
-    const { user, ...rest } = video;
+export const addVideo = async (req: Request, next: NextFunction) => {
+    const video = req.body;
+    const { userId } = req.params
+
+
+
+
+    if (req.files) {
+        if ('thumbnail' in req.files) {
+            const uploadThumbnail = await uploadFileToCloud(req.files.thumbnail[0].path);
+            if (uploadThumbnail) {
+                video.thumbnail = uploadThumbnail.secure_url;
+            }
+
+        }
+        if ('video' in req.files) {
+            const uploadVideo = await uploadVideoToCloud(req.files.video[0].path);
+            if (uploadVideo) {
+                video.video = uploadVideo.secure_url;
+            }
+        }
+
+    }
+
+
+
     try {
-        const addVideo = new Video({ ...rest, userId: user._id });
+        const addVideo = new Video({ ...video, userId });
         const newVideo = await addVideo.save();
         return newVideo;
     } catch (error) {
