@@ -15,7 +15,14 @@ export const addVideoHandler = async (req: Request, res: Response, next: NextFun
 
 export const getAllVideoHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const video = await getAllVideo(req, next);
+        let video;
+        if (req.query.search) {
+            video = await getSearchVideos(req, next);
+        }
+        else {
+
+         video = await getAllVideo(req, next);
+        }
         if (video) {
             return res.status(201).json({ video })
         }
@@ -118,6 +125,7 @@ export const getTrendingVideoHandler = async (req: Request, res: Response, next:
 }
 export const getRandomVideoHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        
         const video = await getRandomVideos(next);
         if (video) {
             return res.status(201).json({ video })

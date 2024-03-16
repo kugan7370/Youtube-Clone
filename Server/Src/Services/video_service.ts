@@ -44,7 +44,8 @@ export const addVideo = async (req: Request, next: NextFunction) => {
 }
 
 export const getAllVideo = async (req: Request, next: NextFunction, isSingleVideo?: boolean) => {
-
+// if search is available
+   
     try {
         const videoPipeline = [
             {
@@ -307,7 +308,7 @@ export const getSubscriptionVideos = async (req: Request, next: NextFunction) =>
 }
 
 export const getSearchVideos = async (req: Request, next: NextFunction) => {
-
+console.log(req.query.search)
     try {
         const getVideo = await Video.aggregate([
             {
@@ -320,7 +321,7 @@ export const getSearchVideos = async (req: Request, next: NextFunction) => {
             },
             { $unwind: "$userDetails" },
             { $project: { "userDetails.password": 0, "userId": 0 } },
-            { $match: { title: { $regex: req.body.search, $options: "i" } } },
+            { $match: { title: { $regex: req.query.search, $options: "i" } } },
             { $sort: { createdAt: -1 } },
 
         ]);
