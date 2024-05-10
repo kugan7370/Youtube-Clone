@@ -1,6 +1,6 @@
 
 
-# Ecommerce APP
+# Youtube Clone 
 
 It's where you can share, watch, and connect through awesome videos. Whether you're into travel, comedy, or anything in between, our easy-to-use platform lets you share your own stories and talents while discovering new ones. With personalized recommendations, it's like your own tailor-made video world. Join us and dive into the fun!
 
